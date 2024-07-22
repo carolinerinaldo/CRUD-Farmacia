@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.generation.CRUD_Farmacia.model.Produto;
+import com.generation.CRUD_Farmacia.repository.CategoriaRepository;
 import com.generation.CRUD_Farmacia.repository.ProdutoRepository;
 
 @RestController
@@ -17,6 +18,9 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+    
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @GetMapping
     public ResponseEntity<List<Produto>> getAll() {
@@ -37,14 +41,26 @@ public class ProdutoController {
 
     @PostMapping
     public ResponseEntity<Produto> post(@RequestBody Produto produto) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(produtoRepository.save(produto));
+        return categoriaRepository.findById(produto.getCategoria().getId())
+                .map(categoria -> {
+                    produto.setCategoria(categoria);
+                    return ResponseEntity.status(HttpStatus.CREATED)
+                            .body(produtoRepository.save(produto));
+                })
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping
     public ResponseEntity<Produto> put(@RequestBody Produto produto) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(produtoRepository.save(produto));
+        return produtoRepository.findById(produto.getId())
+                .map(existingProduto -> categoriaRepository.findById(produto.getCategoria().getId())
+                        .map(categoria -> {
+                            produto.setCategoria(categoria);
+                            return ResponseEntity.status(HttpStatus.OK)
+                                    .body(produtoRepository.save(produto));
+                        })
+                        .orElse(ResponseEntity.badRequest().build()))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

@@ -1,10 +1,6 @@
 package com.generation.CRUD_Farmacia.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -22,11 +18,11 @@ public class Produto {
     @NotBlank
     @Size(min = 10, max = 500, message = "O campo deve conter no mínimo 10 e no máximo 500 caracteres")
     private String descricao;
-    
+
     @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
-    
     public Long getId() {
         return id;
     }
@@ -42,7 +38,7 @@ public class Produto {
     public void setNome(String nome) {
         this.nome = nome;
     }
-    
+
     public String getDescricao() {
         return descricao;
     }
