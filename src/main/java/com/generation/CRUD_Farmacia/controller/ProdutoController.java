@@ -18,7 +18,7 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoRepository produtoRepository;
-    
+
     @Autowired
     private CategoriaRepository categoriaRepository;
 
